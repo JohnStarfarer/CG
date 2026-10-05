@@ -1,0 +1,24 @@
+GLFW (или GLAD, SDL), GLEF
+
+ubunta
+apt install build-essential mesa-common-dev libglfw3-dev libglew-dev
+
+fedora
+dnf install make gcc-g++ build-essential mesa-libGL-devel glfw3-devel glew-devel
+
+mac
+brew.sh
+x-code
+brew install glfw glew
+
+windows
+скачать: GLFW, GLEW
+vs, nugget
+
+VSCode, CodeBlock, etc.
+
+g++ main.cpp -lGL -lGLEW -lglfw -o main.out
+or
+g++ main.cpp -lGL -lGLEW -lglfw3 -o main.out
+
+OpenGL GLM github
