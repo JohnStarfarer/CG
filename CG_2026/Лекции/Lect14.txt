@@ -1,0 +1,439 @@
+Вычислительная
+геометрия и алгоритмы
+компьютерной графики
+Лекция №14:
+Оптимизация шейдеров
+к.ф.-м.н.
+Рябинин Константин Валентинович,
+kostya.ryabinin@gmail.com
+ст. преподаватель
+Лабутин Иван Александрович,
+linuxrf@gmail.com
+
+Пермь – 2025
+
+Тривиальные мысли
+
+Чем меньше действий, тем лучше :)
+
+2/7
+
+Использование возможностей GLSL
+
+3/7
+
+1. Операции с векторами и матрицами, где можно
+2. "Коктейли" (swizzling): alpha.xy = beta.yz
+3.Встроенные функции
+(mix, dot, cross, normalize, length, reflect, ...)
+4.Замена сложной математики на выборку из
+текстуры
+5. Перенос вычислений из фрагментного шейдера
+в вершинный
+6. Использование пониженной точности
+вычислений и представления атрибутов
+(кроме координат)
+7. Отказ от discard и явной записи в буфер глубины
+
+Dynamic Branching
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+
+4/7
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+Instruction 3
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+Instruction 3
+Instruction 4
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+Instruction 3
+Instruction 4
+Instruction 5
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+Instruction 3
+Instruction 4
+Instruction 5
+
+C4
+
+C1
+
+C2
+
+C3
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+Instruction 1
+Instruction 2
+Instruction 3
+Instruction 4
+Instruction 5
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+Instruction 1
+
+Instruction 2
+
+if (cond)
+
+Instruction 3
+Instruction 4
+Instruction 5
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+Instruction 1
+
+Instruction 2
+
+if (cond)
+
+Instruction 3
+
+Instruction 3
+
+Instruction 4
+Instruction 5
+
+C4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+Instruction 1
+
+Instruction 2
+
+if (cond)
+
+Instruction 3
+
+Instruction 3
+
+Instruction 4
+Instruction 5
+
+C4
+
+I4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+Instruction 1
+
+Instruction 2
+
+if (cond)
+
+Instruction 3
+
+Instruction 3
+
+Instruction 4
+Instruction 5
+
+Instruction 5
+
+C4
+
+I4
+
+Dynamic Branching
+
+4/7
+
+Условные переходы (if, for, do, while)
+конфликтуют с SIMD-парадигмой
+C1
+
+C2
+
+C3
+
+C4
+
+C1
+
+C2
+
+C3
+
+Instruction 1
+
+Instruction 1
+
+Instruction 2
+
+if (cond)
+
+Instruction 3
+
+Instruction 3
+
+Instruction 4
+
+Instruction 5
+
+Instruction 5
+
+Instruction 6
+
+C4
+
+I4
+
+Conditional Move
+
+Замена ветвлений:
+1. step(edge, x) := x < edge ? 0 : 1
+2. min / max
+3. mix
+4.Тернарный оператор
+
+5/7
+
+Dependent Texture Read
+
+6/7
+
+Dependent Texture Read — ситуация, когда чтение
+данных из текстуры выполняется не по тем
+текстурным координатам, которые были
+переданы во фрагментный шейдер
+Это не позволяет драйверу видеокарты
+оптимизировать пересылку данных между
+различными областями памяти
+По возможности следует избегать
+трансформации текстурных
+координат во фрагментном шейдере
+
+MAD-инструкции
+
+Вычисления вида A * B + C
+выполняются GPU за один такт
+
+result = (0.5 * alpha) + 0.5;
+лучше, чем
+result = (alpha + 1.0) / 2.0;
+result = (alpha + 1.0) * 0.5;
+result = (alpha / 2.0) + 0.5;
+
+7/7
+
+

@@ -1,0 +1,69 @@
+Вычислительная
+геометрия и алгоритмы
+компьютерной графики
+Лекция №9.2:
+Наложение текстур
+к.ф.-м.н., доцент
+Рябинин Константин Валентинович,
+kostya.ryabinin@gmail.com
+ст. преподаватель
+Лабутин Иван Александрович,
+linuxrf@gmail.com
+
+Пермь – 2026
+
+Шейдеры
+=========== vertex shader ===========
+in vec4 a_position;
+in vec2 a_texCoord;
+out vec2 v_texCoord;
+void main()
+{
+v_texCoord = a_texCoord;
+gl_Position = a_position;
+}
+=========== fragment shader ===========
+uniform sampler2D u_map;
+in vec2 v_texCoord;
+layout (position = 0) out vec4 u_color;
+void main()
+{
+o_color = texture(u_map, v_texCoord);
+}
+
+2/5
+
+Основная программа
+
+3/5
+
+=========== init ===========
+GLsizei texW, texH;
+GLvoid *image = loadTexture(filename, &texW, &texH);
+GLuint texID;
+glGenTextures(1, &texID);
+glBindTexture(GL_TEXTURE_2D, texID);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texW, texH, 0, GL_RGBA,
+GL_UNSIGNED_BYTE, image);
+delete[] image;
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+GLint mapLocation = glGetUniformLocation(program, "u_map");
+=========== draw ===========
+glActiveTexture(GL_TEXTURE0 + texUnit);
+glBindTexture(GL_TEXTURE_2D, texID);
+glUniform1i(mapLocation, texUnit);
+=========== cleanup ===========
+glDeleteTextures(&texID);
+
+Связь текстуры с шейдером
+
+4/5
+
+Texture Mapping Unit (TMU)
+
+5/5
+
+
